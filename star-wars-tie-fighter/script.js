@@ -1,17 +1,14 @@
-const interval = 500; // ms
+const params = {
+  birthInterval: 400,
+  lifeTime: 3000,
+  scaleRange: [ 1, 4 ],
+  angleRange: [ 45, 90 ],
+  shooterChance: 0.6,
+};
 
-function randomShip() {
+const [ width, height ] = [ window.innerWidth - 48, window.innerHeight - 48 ];
 
-  /* const tf = document.createElement("div");
-  const cp = document.createElement("div"); */
-
-  const size = Math.floor(Math.random() * 3) + 1;
-  const angle = `${Math.floor(Math.random() * 90) - 45}deg`;
-
-  const [ width, height ] = [ window.innerWidth - 48, window.innerHeight - 48 ];
-
-  const isShooter = (Math.random() > 0.7);
-
+function createFighter() {
   const container = document.createElement("div");
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
@@ -19,18 +16,36 @@ function randomShip() {
 
   svg.appendChild(use);
   container.appendChild(svg);
-
-  container.setAttribute("class", `fighter ${(isShooter) ? "shooter" : ""}`);
-  container.style.transform = `scale(${size}) rotate(${angle})`;
-  container.style.opacity = 0.33 * size;
-  container.style.left = `${Math.floor(Math.random() * (width - 48))}px`;
-  container.style.top = `${Math.floor(Math.random() * (height - 48))}px`;
-
-  document.body.appendChild(container);
-
-  // remove when outside of view
-  setTimeout(() => container.parentNode.removeChild(container), 3000);
+  return container;
 }
 
-randomShip();
-setInterval(randomShip, interval);
+function randomShip({ lifeTime, scaleRange, angleRange, shooterChance }) {
+
+  const fighter = createFighter();
+  
+  const size = Math.floor(Math.random() * scaleRange[1]) + scaleRange[0];
+  const angle = `${Math.floor(Math.random() * angleRange[1]) - angleRange[0]}deg`;
+
+  fighter.setAttribute(
+    "class", `fighter ${
+      (Math.random() > shooterChance)
+        ? "shooter"
+        : ""
+    }`
+  );
+
+  Object.assign(fighter.style, {
+    transform: `scale(${size}) rotate(${angle})`,
+    opacity: 0.33 * size,
+    top: `${Math.floor(Math.random() * (height - 48))}px`,
+    left: `${Math.floor(Math.random() * (width - 48))}px`,
+  });
+
+  document.body.appendChild(fighter);
+
+  // remove when outside of view
+  setTimeout(() => fighter.parentNode.removeChild(fighter), lifeTime);
+}
+
+randomShip(params);
+setInterval(randomShip, params.birthInterval, params);
