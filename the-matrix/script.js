@@ -2,17 +2,47 @@ const params = {
   size: 10,
   bgColor: "rgba(0, 0, 0, 0.05)",
   textColor: "#0F0",
-  interval: 33,
+  interval: 70,
   minHeight: 50,
-  chars: "0123456789ABCDEF".split("")
+  chars: [
+    [ 48, 57 ],     // digits
+    [ 65, 90 ],     // capital letters
+    [ 8704, 8959 ]  // math symbols
+  ]
 };
 
+// settings up screen and context
 const context = document.getElementById("canvas").getContext("2d");
 const width = (context.canvas.width = window.screen.width);
 const height = (context.canvas.height = window.screen.height);
 
+// screen's width is broken up to columns according to the size
 const columns = new Array(Math.floor(width / params.size) + 1).fill(0);
-const randomItem = items => items[ Math.floor(Math.random() * items.length) ];
+
+function randomFromRanges() {
+  let total = 0;
+  for (const [ a, b ] of arguments) {
+    // adding the ranges' size
+    total += b - a + 1;
+  }
+  
+  let randIntInclusive = Math.floor(Math.random() * total);
+  
+  for (const [ a, b ] of arguments) {
+    if (randIntInclusive < b - a + 1) {
+      return a + randIntInclusive;
+    } else {
+      randIntInclusive -= b - a + 1;
+    }
+  }
+}
+
+const randUnicodeChar = (ranges) => (
+  String.fromCharCode(
+    //Math.floor(Math.random() * (max - min + 1)) + min
+    randomFromRanges(...ranges)
+  )
+);
 
 function render({ chars, size, bgColor, textColor, minHeight }) {
   context.fillStyle = bgColor;
@@ -20,7 +50,7 @@ function render({ chars, size, bgColor, textColor, minHeight }) {
   context.fillStyle = textColor;
   columns.map((value, index) => {
     // value -> y-coordinate
-    context.fillText(randomItem(chars), index * size, value);
+    context.fillText(randUnicodeChar(chars), index * size, value);
     columns[index] =
       value >= height ||
         value > minHeight + 10000 * Math.random()
