@@ -1,8 +1,9 @@
 export default class App {
-  constructor({ context }) {
+  constructor({ context, isMobile }) {
     this.context = context;
     this.width = context.canvas.width;
     this.height = context.canvas.height;
+    this.isMobile = isMobile;
 
     this.whirlpoolsAmount = 5;
     this.particlesAmount = 1000;
@@ -29,9 +30,10 @@ export default class App {
   }
 
   init() {
-    this.context.lineWidth = 1.5;
+    this.context.lineWidth = (this.isMobile) ? 1 : 1.5;
     this.context.imageSmoothingEnabled = false;
     this.hueShift = App.randInt(360);
+
     // create whirlpools
     for (let k = 0; k < this.whirlpoolsAmount; ++k) {
       this.whirlpools.push(
